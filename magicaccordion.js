@@ -23,11 +23,11 @@
 				if(self.hasClass('menu-init')) return;
 				self.addClass('menu-init')
 				self.find("li").each(function() {
-					if ($(this).find("ul").size() != 0) {
+					if ($(this).find("ul").length) {
 					    $(this).find("ul").hide();
 					    $(this).find("a:first").after("<span class='" + opts.closedSign + "'>" + opts.closedSign + "</span>");
 					    if ($(this).find("a:first").attr('href') == "#") {
-					        $(this).find("a:first").click(function() {
+					        $(this).find("a:first").on('click', function() {
 					            return false
 					        });
 					    }
@@ -41,13 +41,13 @@
 						methods.menuAction(self, $(this));
 					});
 				} else {
-					self.find("li span").click(function() {
+					self.find("li span").on('click', function() {
 						methods.menuAction(self, $(this));
 					});
 				}
 				var catplus = self.find('.nav-accordion >.level0:hidden').not('.all-cat');
 				if (catplus.length){
-					self.find('.all-cat').show().click(function(event) {
+					self.find('.all-cat').show().on('click', function(event) {
 					    $(this).children().toggle();
 					    catplus.slideToggle('slow');
 					});
@@ -59,7 +59,7 @@
             menuAction : function(self, item){
             	var opts = $.extend(defaults, options);
             	var parent = item.parent();
-                if (parent.find("ul").size() != 0) {
+                if (parent.find("ul").length) {
                     if (opts.accordion) {
                         if (!parent.find("ul").is(':visible')) {
                             var parents = parent.parents("ul");
