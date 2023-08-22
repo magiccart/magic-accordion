@@ -4,6 +4,7 @@
         var defaults = {
             accordion: true,
             mouseType: false,
+            leveltop: true,
             speed: 300,
             closedSign: 'collapse',
             openedSign: 'expand',
@@ -21,7 +22,15 @@
             menuLoad : function(self){
 				var opts = $.extend(defaults, options);
 				if(self.hasClass('menu-init')) return;
-				self.addClass('menu-init')
+				self.addClass('menu-init');
+                if(!opts.leveltop){
+                    self.on('click', '> li', function(e){
+                        if($(e.target).parent().parent().is($(this))){
+                            e.preventDefault();
+                            $(this).find('> .expand, > .collapse').trigger('click');
+                        }
+                    });
+                }
 				self.find("li").each(function() {
 					if ($(this).find("ul").length) {
 					    $(this).find("ul").hide();
