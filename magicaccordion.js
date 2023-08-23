@@ -24,10 +24,11 @@
 				if(self.hasClass('menu-init')) return;
 				self.addClass('menu-init');
                 if(!opts.leveltop){
-                    self.on('click', '> li', function(e){
-                        if($(e.target).parent().parent().is($(this))){
+                    self.on('click', 'a.level-top', function(e){
+                        var submenu = $(this).parent().find('.submenu');
+                        if(submenu.length){
                             e.preventDefault();
-                            $(this).find('> .expand, > .collapse').trigger('click');
+                            $(this).siblings('.expand, .collapse').trigger('click');
                         }
                     });
                 }
