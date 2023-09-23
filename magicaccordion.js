@@ -33,11 +33,6 @@
 					if ($(this).find("ul").length) {
 					    $(this).find("ul").hide();
 					    $(this).find("a:first").after("<span class='" + opts.closedSign + "'>" + opts.closedSign + "</span>");
-					    if ($(this).find("a:first").attr('href') == "#") {
-					        $(this).find("a:first").on('click', function() {
-					            return false
-					        });
-					    }
 					}
 				});
 		        if (opts.openedActive) {
