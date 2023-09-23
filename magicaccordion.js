@@ -24,12 +24,9 @@
 				if(self.hasClass('menu-init')) return;
 				self.addClass('menu-init');
                 if(!opts.leveltop){
-                    self.on('click', 'a.level-top', function(e){
-                        var submenu = $(this).parent().find('.submenu');
-                        if(submenu.length){
-                            e.preventDefault();
-                            $(this).siblings('.expand, .collapse').trigger('click');
-                        }
+                    self.on('click', 'li.level0.hasChild a.level-top', function(e){
+                        e.preventDefault();
+                        $(this).siblings('.expand, .collapse').trigger('click');
                     });
                 }
 				self.find("li").each(function() {
