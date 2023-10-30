@@ -77,7 +77,7 @@
                                 if (close) {
                                     if ($(this).parent().find("ul") != visible[visibleIndex]) {
                                         $(visible[visibleIndex]).slideUp(opts.speed, function() {
-                                            $(this).parent("li").find("a:first").next().html(opts.closedSign).addClass(opts.closedSign)
+                                            $(this).parent("li").find("a:first").next().html(opts.closedSign).addClass(opts.closedSign).removeClass(opts.openedSign)
                                         })
                                     }
                                 }
