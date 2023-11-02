@@ -18,6 +18,10 @@ if (!customElements.get('magic-accordion')) {
             });
         }
 
+        connectedCallback() {
+            if(!this.classList.contains('ajax')) this.initialized();
+        }
+
         datasetToObject(dataset) {
             var object = Object.assign({}, dataset);
             for (var property in object) {
@@ -50,10 +54,6 @@ if (!customElements.get('magic-accordion')) {
             object[property] = value;
             }
             return object;
-        }
-
-        connectedCallback() {
-            if(!this.classList.contains('ajax')) this.initialized();
         }
 
         extend(object1, object2){
