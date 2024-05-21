@@ -2,7 +2,7 @@ if (!customElements.get('magic-accordion')) {
     class MagicAccordion extends HTMLElement{
         constructor() {
             super();
-            var $this = this;
+            var self = this;
             this.defaults = {
                 accordion: true,
                 mouseType: false,
@@ -14,14 +14,13 @@ if (!customElements.get('magic-accordion')) {
              };
             this.settings = {};
             document.addEventListener("MagicAccordion", function (event) {
-                $this.initialized();
+                self.initialized();
             });
         }
 
         connectedCallback() {
             if(!this.classList.contains('ajax')) this.initialized();
         }
-
         datasetToObject(dataset) {
             var object = Object.assign({}, dataset);
             for (var property in object) {
@@ -55,103 +54,204 @@ if (!customElements.get('magic-accordion')) {
             }
             return object;
         }
-
         extend(object1, object2){
-            var obj1 = Object.assign({}, object1),
-                obj2 = Object.assign({}, object2);
-
-            return Object.assign(obj1, obj2);
+            let obj = Object.assign({}, object1);
+            return Object.assign(obj, object2);
         }
+        addEventListener(events, selector, fn){
+            events = events.split(",").map((e) => e.trim());
+            this.querySelectorAll(selector).forEach(element => {
+                events.forEach(event => {
+                    element.addEventListener(event, fn.bind(element));
+                })
+            });
+        }
+        getSibling(element){
+            let siblings = [];
+            for (let sibling of element.parentNode.children) {
+                if (sibling !== element) siblings.push(sibling);
+            }
+            return siblings;
+        }
+        isHidden(element) {
+            var style = window.getComputedStyle(element);
+            return ((style.display === 'none') || (style.visibility === 'hidden'));
+        }
+        parents(selector, element) {
+            if((element instanceof NodeList)){
+                var parents  =  Array.from(element).map((item) => item.closest(selector))
+                .filter((el, index, array) => {
+                    /* remove null value */
+                    return el ? array.indexOf(el) === index : false;
+                });
+                return parents;
+            }else {
+                var closest = element.closest(selector);
+                return closest ? [closest] : [];
+            }
+        }
+        slideUp(target, duration=500) {
+            target.style.transitionProperty = 'height, margin, padding';
+            target.style.transitionDuration = duration + 'ms';
+            target.style.boxSizing = 'border-box';
+            target.style.height = target.offsetHeight + 'px';
+            target.offsetHeight;
+            target.style.overflow = 'hidden';
+            target.style.height = 0;
+            target.style.paddingTop = 0;
+            target.style.paddingBottom = 0;
+            target.style.marginTop = 0;
+            target.style.marginBottom = 0;
+            window.setTimeout( () => {
+              target.style.display = 'none';
+              target.style.removeProperty('height');
+              target.style.removeProperty('padding-top');
+              target.style.removeProperty('padding-bottom');
+              target.style.removeProperty('margin-top');
+              target.style.removeProperty('margin-bottom');
+              target.style.removeProperty('overflow');
+              target.style.removeProperty('transition-duration');
+              target.style.removeProperty('transition-property');
+            }, duration);
+        }
+        slideDown(target, duration=500) {
+            target.style.removeProperty('display');
+            let display = window.getComputedStyle(target).display;
 
+            if (display === 'none')
+                display = 'block';
+            target.style.display = display;
+            let height = target.offsetHeight;
+            target.style.overflow = 'hidden';
+            target.style.height = 0;
+            target.style.paddingTop = 0;
+            target.style.paddingBottom = 0;
+            target.style.marginTop = 0;
+            target.style.marginBottom = 0;
+            target.offsetHeight;
+            target.style.boxSizing = 'border-box';
+            target.style.transitionProperty = "height, margin, padding";
+            target.style.transitionDuration = duration + 'ms';
+            target.style.height = height + 'px';
+            target.style.removeProperty('padding-top');
+            target.style.removeProperty('padding-bottom');
+            target.style.removeProperty('margin-top');
+            target.style.removeProperty('margin-bottom');
+            window.setTimeout( () => {
+                target.style.removeProperty('height');
+                target.style.removeProperty('overflow');
+                target.style.removeProperty('transition-duration');
+                target.style.removeProperty('transition-property');
+            }, duration);
+        }
+        slideToggle(target, duration = 500) {
+            if (window.getComputedStyle(target).display === 'none') {
+                return slideDown(target, duration);
+            } else {
+                return slideUp(target, duration);
+            }
+        }
         initialized() {
-            var $this = this,
-                self = $(this),
+            var self = this,
+                $this = $(this),
                 options = this.datasetToObject(this.dataset) || {};
             this.settings = this.extend(this.defaults, options);
             options = this.settings;
             if(this.classList.contains('init')) return;
             this.classList.add('init');
             if(!options.leveltop){
-                self.on('click', 'li.level0.hasChild a.level-top', function(e){
+                self.addEventListener('click', 'li.level0.hasChild a.level-top', function(e){
                     e.preventDefault();
-                    $(this).siblings('.expand, .collapse').trigger('click');
+                    self.getSibling(this).filter(element => element.matches('.expand, .collaps')).forEach(element =>{
+                        element.click();
+                    })
                 });
             }
-            self.find("li").each(function() {
-                if ($(this).find("ul").length) {
-                    $(this).find("ul").hide();
-                    $(this).find("a:first").after("<span class='" + options.closedSign + "'>" + options.closedSign + "</span>");
+            self.querySelectorAll("li").forEach( element => {
+                let ul = element.querySelectorAll('ul');
+                if(ul.length){
+                    ul.forEach(el => {
+                        el.style.display = 'none';
+                    });
+                    let a = element.querySelector('a');
+                    if(a) a.insertAdjacentHTML("afterend", `<span class="${options.closedSign}">${options.closedSign}</p>`);
                 }
             });
             if (options.openedActive) {
-                $this.openedActive(self);
+                self.openedAllActive();
             }
             if (options.mouseType) {
-                self.find("li a").mouseenter(function() {
-                    $this.menuAction(self, $(this));
+                self.addEventListener('mouseenter', 'li a', function(e){
+                    self.menuAction(this);
                 });
             } else {
-                self.find("li span").on('click', function() {
-                    $this.menuAction(self, $(this));
+                self.addEventListener('click', 'li .collapse, li .expand', function(e){
+                    self.menuAction(this);
                 });
-            }
-            var catplus = self.find('.nav-accordion >.level0:hidden').not('.all-cat');
-            if (catplus.length){
-                self.find('.all-cat').show().on('click', function(event) {
-                    $(this).children().toggle();
-                    catplus.slideToggle('slow');
-                });
-            } else {
-                self.find('.all-cat').hide();
             }
         }
 
-        menuAction(self, item){
-            var options = this.settings;
-            var parent = item.parent();
-            if (parent.find("ul").length) {
+        menuAction(item){
+            var self = this,
+                options = this.settings,
+                parent = item.closest('li'),
+                parentUl = parent.querySelectorAll('ul');
+            if (parentUl.length) {
                 if (options.accordion) {
-                    if (!parent.find("ul").is(':visible')) {
-                        var parents = parent.parents("ul");
-                        var visible = self.find("ul:visible");
-                        visible.each(function(visibleIndex) {
-                            var close = true;
-                            parents.each(function(parentIndex) {
-                                if (parents[parentIndex] == visible[visibleIndex]) {
-                                    close = false;
-                                    return false
-                                }
-                            });
-                            if (close) {
-                                if ($(this).parent().find("ul") != visible[visibleIndex]) {
-                                    $(visible[visibleIndex]).slideUp(options.speed, function() {
-                                        $(this).parent("li").find("a:first").next().html(options.closedSign).addClass(options.closedSign).removeClass(options.openedSign)
-                                    })
-                                }
+                    var parents = self.parents('ul', parent),
+                        visible = Array.from(self.querySelectorAll("ul")).filter(element => !self.isHidden(element));
+                    visible.forEach(function(element, visibleIndex) {
+                        var close = true;
+                        parents.some(function(el, parentIndex) {
+                            if (parents[parentIndex] == visible[visibleIndex]) {
+                                close = false;
+                                return false
                             }
+                            return true;
                         });
-                    }
+                        if (close) {
+                            self.slideUp(visible[visibleIndex], options.speed);
+                            self.clossedActive(element);
+                        }
+                    });
                 }
-                var parentFirst = parent.find("ul:first");
-                if (parentFirst.is(":visible")) {
-                    parentFirst.slideUp(options.speed, function() {
-                        $(this).parent("li").find("a:first").next().delay(options.speed + 1000).html(options.closedSign).removeClass(options.openedSign).addClass(options.closedSign)
-                    });
+                var parentFirst = parent.querySelector("ul");
+                if (!self.isHidden(parentFirst)) {
+                    self.slideUp(parentFirst, options.speed);
+                    parentFirst.classList.remove('opended');
+                    parentFirst.classList.add('clossed');
+                    self.clossedActive(parentFirst);
                 } else {
-                    parentFirst.slideDown(options.speed, function() {
-                        $(this).parent("li").find("a:first").next().delay(options.speed + 1000).html(options.openedSign).removeClass(options.closedSign).addClass(options.openedSign)
-                    });
+                    self.slideDown(parentFirst, options.speed);
+                    parentFirst.classList.remove('clossed');
+                    parentFirst.classList.add('opended');
+                    self.openedActive(parentFirst);
                 }
             }
         }
-
-        openedActive(self){
+        clossedActive(element){
+            var options = this.settings,
+                arrow = element.closest("li").querySelector("a").nextElementSibling;
+            arrow.classList.add(options.closedSign);
+            arrow.classList.remove(options.openedSign);
+            arrow.textContent = options.closedSign;
+        }
+        openedActive(element){
+            var options = this.settings,
+                arrow = element.closest("li").querySelector("a").nextElementSibling;
+            arrow.classList.add(options.openedSign);
+            arrow.classList.remove(options.closedSign);
+            arrow.textContent = options.openedSign;
+        }
+        openedAllActive(){
             var options = this.settings;
-            self.find("li.active").each(function() {
-                $(this).parents("ul").slideDown(options.speed, options.easing);
-                $(this).parents("ul").parent("li").find("a:first").next().html(options.openedSign).removeClass(options.closedSign).addClass(options.openedSign);
-                $(this).find("ul:first").slideDown(options.speed, options.easing);
-                $(this).find("a:first").next().html(options.openedSign).removeClass(options.closedSign).addClass(options.openedSign)
+            this.querySelectorAll("li.active").forEach( element => {
+                self.parents('ul', element).forEach(ul =>{
+                    self.slideDown(ul, options.speed);
+                    self.openedActive(ul);
+                });
+                self.slideDown(element.querySelector('ul'), options.speed);
+                self.openedActive(element);
             });
         }
     }
