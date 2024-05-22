@@ -162,7 +162,7 @@ if (!customElements.get('magic-accordion')) {
             if(!options.leveltop){
                 self.addEventListener('click', 'li.level0.hasChild a.level-top', function(e){
                     e.preventDefault();
-                    self.getSibling(this).filter(element => element.matches('.expand, .collaps')).forEach(element =>{
+                    self.getSibling(this).filter(element => element.matches('.expand, .collapse')).forEach(element =>{
                         element.click();
                     })
                 });
