@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>     <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>       <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>       <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js"><!--<![endif]-->
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <title>Slideup/SlideDown</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <style>
+        div {
+            transition: height .5s ease;
+            overflow  : hidden;
+        }
+
+        div:not(.active) {
+            display: none;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+          var container = document.querySelector('div')
+          var button    = document.querySelector('button')
+
+          button.addEventListener('click', () => {
+            /** Slide down. */
+              if(!container.classList.contains('active')) {
+              /** Show the container. */
+                container.classList.add('active')
+                  container.style.height = "auto"
+                  
+              /** Get the computed height of the container. */
+                var height = container.clientHeight + "px"
+
+              /** Set the height of the content as 0px, */
+                  /** so we can trigger the slide down animation. */
+                  container.style.height = "0px"
+
+              /** Do this after the 0px has applied. */
+                  /** It's like a delay or something. MAGIC! */
+                  setTimeout(() => {
+                      container.style.height = height
+                  }, 0) 
+              
+            /** Slide up. */
+              } else {
+                /** Set the height as 0px to trigger the slide up animation. */
+                container.style.height = "0px"
+                  
+                  /** Remove the `active` class when the animation ends. */
+                container.addEventListener('transitionend', () => {
+                    container.classList.remove('active')
+                  }, {once: true})
+              }
+          })
+        }, false);
+    </script>
+</head>
+
+<body>
+  <div>
+      I'm an unknown content height element. I'm an unknown content height element. I'm an unknown content height element. I'm an unknown content height element. I'm an unknown content height element. I'm an unknown content height element. I'm an unknown content height element. I'm an unknown content height element. I'm an unknown content height element. I'm an unknown content height element. I'm an unknown content height element. I'm an unknown content height element. I'm an unknown content height element. I'm an unknown content height element. I'm an unknown content height element. 
+  </div>
+  <button>Slide Toggle</button>
+</body>
+
+</html>
