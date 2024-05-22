@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>     <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>       <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>       <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js"><!--<![endif]-->
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <title>Slideup/SlideDown</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <style>
+        .contents {
+          background: lightblue;
+          color: rgba(0, 0, 0, .8);
+          padding: 20px;
+          margin:0;
+        }
+        .slide-up, .slide-down {
+          overflow:hidden;
+        }
+        .slide-up > div, .slide-down > div {
+          transform: translateY(100%);
+          transition: .4s ease-in-out;
+        }
+        .slide-down > div {            
+          transform: translateY(0);
+        } 
+    </style>
+    <script>
+        // slideup/slidedown
+        trigger = function () {
+            console.log(Slider)
+            /* Why Variable Slider work ? */
+            Slider.classList.toggle("slide-down")
+            //Slider.classList.toggle("slideup")
+        };
+    </script>
+</head>
+
+<body>
+    <div class="container" style="padding: 40px">
+
+      <button onclick="trigger()">Trigger Slideup/SlideDown</button>
+
+      <div id="Slider" class="slide-up">
+        <div>
+          <p class="contents">
+            Hello World Text
+          </p>
+        </div>
+      </div>
+
+    </div>
+</body>
+
+</html>
