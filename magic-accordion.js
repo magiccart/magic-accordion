@@ -73,10 +73,6 @@ if (!customElements.get('magic-accordion')) {
             }
             return siblings;
         }
-        isHidden(element) {
-            var style = window.getComputedStyle(element);
-            return ((style.display === 'none') || (style.visibility === 'hidden'));
-        }
         parents(selector, element) {
             if((element instanceof NodeList)){
                 var parents  =  Array.from(element).map((item) => item.closest(selector))
@@ -112,6 +108,7 @@ if (!customElements.get('magic-accordion')) {
               target.style.removeProperty('overflow');
               target.style.removeProperty('transition-duration');
               target.style.removeProperty('transition-property');
+              target.classList.remove('down');
             }, duration);
         }
         slideDown(target, duration=500) {
@@ -142,6 +139,7 @@ if (!customElements.get('magic-accordion')) {
                 target.style.removeProperty('overflow');
                 target.style.removeProperty('transition-duration');
                 target.style.removeProperty('transition-property');
+                target.classList.add('down');
             }, duration);
         }
         slideToggle(target, duration = 500) {
@@ -162,7 +160,7 @@ if (!customElements.get('magic-accordion')) {
             if(!options.leveltop){
                 self.addEventListener('click', 'li.level0.hasChild a.level-top', function(e){
                     e.preventDefault();
-                    self.getSibling(this).filter(element => element.matches('.expand, .collapse')).forEach(element =>{
+                    self.getSibling(this).filter(element => element.matches('.arrow')).forEach(element =>{
                         element.click();
                     })
                 });
@@ -171,10 +169,10 @@ if (!customElements.get('magic-accordion')) {
                 let ul = element.querySelectorAll('ul');
                 if(ul.length){
                     ul.forEach(el => {
-                        el.style.display = 'none';
+                        // el.style.display = 'none';
                     });
                     let a = element.querySelector('a');
-                    if(a) a.insertAdjacentHTML("afterend", `<span class="${options.closedSign}">${options.closedSign}</p>`);
+                    if(a) a.insertAdjacentHTML("afterend", `<span class="arrow ${options.closedSign}">${options.closedSign}</p>`);
                 }
             });
             if (options.openedActive) {
@@ -185,7 +183,7 @@ if (!customElements.get('magic-accordion')) {
                     self.menuAction(this);
                 });
             } else {
-                self.addEventListener('click', 'li .collapse, li .expand', function(e){
+                self.addEventListener('click', 'li .arrow', function(e){
                     self.menuAction(this);
                 });
             }
@@ -198,9 +196,11 @@ if (!customElements.get('magic-accordion')) {
                 parentUl = parent.querySelectorAll('ul');
             if (parentUl.length) {
                 if (options.accordion) {
-                    var parents = self.parents('ul', parent),
-                        visible = Array.from(self.querySelectorAll("ul")).filter(element => !self.isHidden(element));
+                    var parentFirst = parent.querySelector("ul"),
+                        parents = self.parents('ul', parent),
+                        visible = Array.from(self.querySelectorAll("ul")).filter(element => element.classList.contains('down'));
                     visible.forEach(function(element, visibleIndex) {
+                        if(element == parentFirst) return;
                         var close = true;
                         parents.some(function(el, parentIndex) {
                             if (parents[parentIndex] == visible[visibleIndex]) {
@@ -210,21 +210,16 @@ if (!customElements.get('magic-accordion')) {
                             return true;
                         });
                         if (close) {
-                            self.slideUp(visible[visibleIndex], options.speed);
+                            self.slideUp(element, options.speed);
                             self.clossedActive(element);
                         }
                     });
                 }
-                var parentFirst = parent.querySelector("ul");
-                if (!self.isHidden(parentFirst)) {
+                if (parentFirst.classList.contains('down')) {
                     self.slideUp(parentFirst, options.speed);
-                    parentFirst.classList.remove('opended');
-                    parentFirst.classList.add('clossed');
                     self.clossedActive(parentFirst);
                 } else {
                     self.slideDown(parentFirst, options.speed);
-                    parentFirst.classList.remove('clossed');
-                    parentFirst.classList.add('opended');
                     self.openedActive(parentFirst);
                 }
             }
