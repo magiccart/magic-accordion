@@ -151,7 +151,6 @@ if (!customElements.get('magic-accordion')) {
         }
         initialized() {
             var self = this,
-                $this = $(this),
                 options = this.datasetToObject(this.dataset) || {};
             this.settings = this.extend(this.defaults, options);
             options = this.settings;
